@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+  exchange:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pmdcosta/exchange:latest
