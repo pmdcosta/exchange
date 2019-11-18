@@ -2,7 +2,8 @@
 		build \
 		test \
 		start \
-		stop
+		stop \
+		integration-tests
 
 SHELL := /bin/bash
 
@@ -21,3 +22,9 @@ start:
 # Stops the exchange instance
 stop:
 	docker-compose down
+
+# Runs the integration tests
+integration-tests:
+	make build && \
+	make start && \
+	go test -tags=integration ./test
