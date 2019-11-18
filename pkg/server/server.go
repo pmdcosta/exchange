@@ -29,7 +29,7 @@ func New(logger *zerolog.Logger, host string) *Server {
 }
 
 // Start starts accepting http requests
-func (s *Server) Start(routes func(router chi.Router), middlewares ...func(http.Handler) http.Handler) error {
+func (s *Server) Start(routes func(router chi.Router), middlewares ...func(http.Handler) http.Handler) {
 	// create http router
 	router := chi.NewRouter()
 
@@ -53,19 +53,17 @@ func (s *Server) Start(routes func(router chi.Router), middlewares ...func(http.
 	s.logger.Info().Str("host", s.host).Msg("starting http server...")
 	listener, err := net.Listen("tcp", s.server.Addr)
 	if err != nil {
-		s.logger.Error().Err(err).Str("host", s.host).Msg("failed to start http server")
-		return err
+		s.logger.Fatal().Err(err).Str("host", s.host).Msg("failed to start http server")
+		return
 	}
 	go s.server.Serve(listener)
-	return nil
 }
 
 // Done terminates the http server
-func (s *Server) Done() error {
+func (s *Server) Done() {
 	s.logger.Info().Msg("stopping http server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	s.server.Shutdown(ctx)
 	s.logger.Info().Msg("stopped http server")
-	return nil
 }
