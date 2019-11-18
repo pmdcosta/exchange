@@ -41,6 +41,7 @@ Additionally, the following `Make` commands are available:
 - `make build` builds the docker image.
 - `make start` starts the server locally.
 - `make stop` stops the server.
+- `make integration-tests` starts the server in a container and runs integration tests against it.
 
 
 ## Possible Improvements
