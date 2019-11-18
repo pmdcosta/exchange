@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// Server represents the http server
+// Server is the http server
 type Server struct {
 	logger *zerolog.Logger
 	server *http.Server
