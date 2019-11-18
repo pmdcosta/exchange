@@ -38,27 +38,30 @@ func (h *Handler) GetRate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//check whether this is a good time to exchange money
-	good, reason := h.recommendation(latest[currency.EUR], currency.EUR, rates)
-
 	// build response
 	resp := GetRatesResponse{
 		Rate: map[string]float64{
 			c.String():            1,
 			currency.EUR.String(): latest[currency.EUR],
 		},
-		Exchange: GetRatesRecommendationResponse{
+	}
+
+	//check whether this is a good time to exchange money
+	if h.recommendation != nil {
+		good, reason := h.recommendation(latest[currency.EUR], currency.EUR, rates)
+		resp.Exchange = &GetRatesRecommendationResponse{
 			Good:   good,
 			Reason: reason,
-		},
+		}
 	}
+
 	_ = writeJSON(w, http.StatusOK, resp)
 }
 
 // GetRatesResponse is the http response for the GetRate request
 type GetRatesResponse struct {
-	Rate     map[string]float64             `json:"rate"`
-	Exchange GetRatesRecommendationResponse `json:"exchange"`
+	Rate     map[string]float64              `json:"rate"`
+	Exchange *GetRatesRecommendationResponse `json:"exchange,omitempty"`
 }
 
 // GetRatesRecommendationResponse is part of the GetRatesResponse

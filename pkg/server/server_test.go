@@ -3,6 +3,7 @@ package server_test
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/pmdcosta/exchange/pkg/server"
@@ -26,6 +27,7 @@ func TestServer(t *testing.T) {
 	// start and stop server
 	go s.Start(r)
 	defer s.Done()
+	time.Sleep(100 * time.Millisecond) // wait for the server to boot
 
 	// execute request
 	_, err := http.Get("http://localhost:8080/test")
