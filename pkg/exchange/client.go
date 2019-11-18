@@ -93,7 +93,7 @@ func (c Client) buildURL(path string, params map[string]string) *url.URL {
 
 // fetch executes an http request
 func (c Client) fetch(u *url.URL, resp interface{}) error {
-	c.logger.Info().Str("url", u.String()).Msg("executing http request")
+	c.logger.Info().Str("url", u.String()).Msg("executing http request...")
 
 	// if available, retrieve from cache
 	if c.cache != nil {
@@ -108,23 +108,27 @@ func (c Client) fetch(u *url.URL, resp interface{}) error {
 	// execute http request
 	r, err := c.client.Get(u.String())
 	if err != nil {
+		c.logger.Error().Str("url", u.String()).Err(err).Msg("failed to execute http request")
 		return err
 	}
 	defer r.Body.Close()
 
 	// check status code
 	if r.StatusCode != http.StatusOK {
+		c.logger.Error().Str("url", u.String()).Str("status", http.StatusText(r.StatusCode)).Msg("unexpected status code")
 		return fmt.Errorf("unexpected status code: %s", http.StatusText(r.StatusCode))
 	}
 
 	// read body
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		c.logger.Error().Str("url", u.String()).Err(err).Msg("failed read response body")
 		return err
 	}
 
 	// handle response
 	if err := json.Unmarshal(bodyBytes, &resp); err != nil {
+		c.logger.Error().Str("url", u.String()).Err(err).Msg("failed to unmarshal response")
 		return err
 	}
 

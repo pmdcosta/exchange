@@ -11,6 +11,7 @@ import (
 func (c Client) GetRange(start time.Time, end time.Time) (map[time.Time]map[currency.Unit]float64, error) {
 	s := fmt.Sprintf("%d-%d-%d", start.Year(), start.Month(), start.Day())
 	e := fmt.Sprintf("%d-%d-%d", end.Year(), end.Month(), end.Day())
+	c.logger.Debug().Str("start", s).Str("end", e).Msg("getting rates in range...")
 	u := c.buildURL(pathHistory, map[string]string{"start_at": s, "end_at": e})
 	var response getRangeResponse
 	if err := c.fetch(u, &response); err != nil {

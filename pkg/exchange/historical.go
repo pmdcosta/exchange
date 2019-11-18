@@ -9,7 +9,9 @@ import (
 
 // GetHistorical retrieves the foreign exchange reference rates for a specific date
 func (c Client) GetHistorical(t time.Time) (map[currency.Unit]float64, error) {
-	u := c.buildURL(fmt.Sprintf("%d-%d-%d", t.Year(), t.Month(), t.Day()), nil)
+	day := fmt.Sprintf("%d-%d-%d", t.Year(), t.Month(), t.Day())
+	c.logger.Debug().Str("day", day).Msg("getting historical rate...")
+	u := c.buildURL(day, nil)
 	var response getHistoricalResponse
 	if err := c.fetch(u, &response); err != nil {
 		return nil, err
