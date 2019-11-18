@@ -1,8 +1,6 @@
 package exchange
 
 import (
-	"net/http"
-
 	"golang.org/x/text/currency"
 )
 
@@ -45,12 +43,5 @@ func SetBaseCurrency(currency currency.Unit) Option {
 func SetCurrencies(currencies ...currency.Unit) Option {
 	return func(c *Client) {
 		c.currencies = currencies
-	}
-}
-
-// SetBackend overrides the http client for the requests
-func SetBackend(client *http.Client) Option {
-	return func(c *Client) {
-		c.client = client
 	}
 }
