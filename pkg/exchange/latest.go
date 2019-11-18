@@ -4,6 +4,7 @@ import "golang.org/x/text/currency"
 
 // GetLatest retrieves the latest foreign exchange reference rates
 func (c Client) GetLatest() (map[currency.Unit]float64, error) {
+	c.logger.Debug().Msg("getting latest rate...")
 	u := c.buildURL(pathLatest, nil)
 	var response getLatestResponse
 	if err := c.fetch(u, &response); err != nil {
