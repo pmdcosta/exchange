@@ -1,32 +1,18 @@
 package exchange
 
-import "golang.org/x/text/currency"
+import (
+	"fmt"
+	"time"
+
+	"golang.org/x/text/currency"
+)
 
 // GetLatest retrieves the latest foreign exchange reference rates
 func (c Client) GetLatest() (map[currency.Unit]float64, error) {
-	c.logger.Debug().Msg("getting latest rate...")
-	u := c.buildURL(pathLatest, nil)
-	var response getLatestResponse
-	if err := c.fetch(u, &response); err != nil {
-		return nil, err
-	}
-	return response.parse(), nil
+	return c.getHistorical(fmt.Sprintf("%d-%d-%d", time.Now().Year(), time.Now().Month(), time.Now().Day()), nil)
 }
 
-// getLatestResponse represents the http response from the GetLatest http request
-type getLatestResponse struct {
-	Rates map[string]float64 `json:"rates"`
-}
-
-// parse returns the mapping of currencies to values from the response of the API
-func (r *getLatestResponse) parse() map[currency.Unit]float64 {
-	var rates = make(map[currency.Unit]float64)
-	for s, v := range r.Rates {
-		c, err := currency.ParseISO(s)
-		if err != nil {
-			continue
-		}
-		rates[c] = v
-	}
-	return rates
+// GetLatestWithParams retrieves the latest foreign exchange reference rates
+func (c Client) GetLatestWithParams(p *Params) (map[currency.Unit]float64, error) {
+	return c.getHistorical(fmt.Sprintf("%d-%d-%d", time.Now().Year(), time.Now().Month(), time.Now().Day()), setParams(p))
 }

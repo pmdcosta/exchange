@@ -6,11 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
-	"golang.org/x/text/currency"
 )
 
 const (
@@ -30,10 +28,6 @@ type Client struct {
 
 	// http address of the API
 	address string
-	// currency to quote against
-	baseCurrency currency.Unit
-	// currencies to return
-	currencies []currency.Unit
 	// cache stores the requests and responses
 	cache Cache
 }
@@ -42,10 +36,9 @@ type Client struct {
 func NewClient(logger *zerolog.Logger, options ...Option) *Client {
 	l := logger.With().Str("pkg", "exchange-client").Logger()
 	c := Client{
-		logger:       &l,
-		client:       &http.Client{Timeout: time.Second * 10},
-		address:      address,
-		baseCurrency: currency.GBP,
+		logger:  &l,
+		client:  &http.Client{Timeout: time.Second * 10},
+		address: address,
 	}
 	for _, opt := range options {
 		opt(&c)
@@ -65,20 +58,6 @@ func (c Client) buildURL(path string, params map[string]string) *url.URL {
 	// build url
 	u, _ := url.Parse(c.address)
 
-	// build url parameters
-	if params == nil {
-		params = make(map[string]string)
-	}
-	// add base currency
-	params["base"] = c.baseCurrency.String()
-	// add currencies
-	if c.currencies != nil || len(c.currencies) != 0 {
-		var symbols = make([]string, 0, len(c.currencies))
-		for _, s := range c.currencies {
-			symbols = append(symbols, s.String())
-		}
-		params["symbols"] = strings.Join(symbols, ",")
-	}
 	// build url query
 	q, _ := url.ParseQuery(u.RawQuery)
 	for k, v := range params {
@@ -136,6 +115,5 @@ func (c Client) fetch(u *url.URL, resp interface{}) error {
 	if c.cache != nil {
 		c.cache.Save(u.RequestURI(), bodyBytes)
 	}
-
 	return nil
 }

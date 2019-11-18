@@ -18,11 +18,21 @@ type Client struct {
 
 func newClient(t *testing.T, address string) *Client {
 	mockCtrl := gomock.NewController(t)
+	logger := zerolog.Nop()
+
+	return &Client{
+		Client:   *exchange.NewClient(&logger, exchange.SetAddress(address)),
+		mockCtrl: mockCtrl,
+	}
+}
+
+func newClientWithCache(t *testing.T, address string) *Client {
+	mockCtrl := gomock.NewController(t)
 	mockCache := mocks.NewMockCache(mockCtrl)
 	logger := zerolog.Nop()
 
 	return &Client{
-		Client:    *exchange.NewClient(&logger, exchange.SetAddress(address)),
+		Client:    *exchange.NewClient(&logger, exchange.SetAddress(address), exchange.SetCache(mockCache)),
 		mockCtrl:  mockCtrl,
 		mockCache: mockCache,
 	}
